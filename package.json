@@ -1,0 +1,41 @@
+{
+	"name": "toodool-back",
+	"version": "1.0.0",
+	"description": "Backend of a sample full stack to-do app",
+	"main": "dist/index.js",
+	"scripts": {
+		"start": "node src/index.js",
+		"dev": "nodemon src/index.js",
+		"dev:debug": "nodemon --inspect src/index.js",
+		"lint": "eslint ./src --ext .js",
+		"test": "jest --i",
+		"test:coverage": "jest --coverage --i --no-cache"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nidib/toodool-back.git"
+	},
+	"keywords": [],
+	"author": "Richard Bidin",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/nidib/toodool-back/issues"
+	},
+	"homepage": "https://github.com/nidib/toodool-back#readme",
+	"devDependencies": {
+		"eslint": "^7.32.0",
+		"eslint-config-airbnb-base": "^14.2.1",
+		"eslint-plugin-import": "^2.24.0",
+		"jest": "^27.0.6",
+		"nodemon": "^2.0.12"
+	},
+	"dependencies": {
+		"compression": "^1.7.4",
+		"cors": "^2.8.5",
+		"dotenv": "^10.0.0",
+		"express": "^4.17.1",
+		"helmet": "^4.6.0",
+		"pg": "^8.7.1",
+		"winston": "^3.3.3"
+	}
+}
