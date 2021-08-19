@@ -24,9 +24,7 @@ class Server {
 	handleListen() {
 		logger.info(`✅ Server started on port ${this.port}`);
 
-		if (this.onListen) {
-			this.onListen();
-		}
+		this.onListen && this.onListen();
 	}
 
 	main() {
