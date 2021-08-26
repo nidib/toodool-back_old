@@ -1,8 +1,19 @@
+const CustomError = require('../errors/CustomError');
+
 class ErrorResponse {
-	constructor(message) {
+	constructor(error) {
+		const { error: finalError } = new CustomError(error);
+
 		this.success = false;
-		this.error = true;
-		this.message = message;
+		this.error = finalError;
+		this.response = this.getResponse();
+	}
+
+	getResponse() {
+		return {
+			error: this.error,
+			success: this.success
+		};
 	}
 }
 

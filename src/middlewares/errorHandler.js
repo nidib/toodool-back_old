@@ -1,11 +1,8 @@
-const CustomError = require('../instances/CustomError');
+const logger = require('../config/logger');
 const ErrorResponse = require('../instances/ErrorResponse');
 
-function errorHandler(error, req, res, _next) {
-	const { message, statusCode } = new CustomError(error.message, req);
-	const response = new ErrorResponse(message);
-
-	res.statusCode = statusCode;
+function errorHandler(error, _req, res, _next) {
+	const { response } = new ErrorResponse(error);
 
 	return res.json(response);
 }
