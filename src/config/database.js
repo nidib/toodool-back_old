@@ -1,7 +1,8 @@
 const { Client, Pool } = require('pg');
+const { isTest } = require('../utils/hepers/environmentHelpers');
 
 function getDatabase() {
-	if (process.env.NODE_ENV === 'test') {
+	if (isTest()) {
 		return new Client({
 			connectionString: process.env.DATABASE_URL_TEST
 		});

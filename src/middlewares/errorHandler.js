@@ -1,10 +1,18 @@
 const logger = require('../config/logger');
-const ErrorResponse = require('../instances/ErrorResponse');
+const ErrorResponse = require('../responses/ErrorResponse');
+const { isProduction } = require('../utils/hepers/environmentHelpers');
+
+const GENERIC_ERROR = { message: 'Something went wrong', statusCode: 500 };
 
 function errorHandler(error, _req, res, _next) {
-	const { response } = new ErrorResponse(error);
+	const errorToResponse = error.caughtException ? error : GENERIC_ERROR;
+	const { response } = new ErrorResponse(errorToResponse);
 
-	return res.json(response);
+	if (!isProduction()) {
+		logger.info(error.stack);
+	}
+
+	return res.status(errorToResponse.statusCode).json(response);
 }
 
 module.exports = errorHandler;

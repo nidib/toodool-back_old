@@ -1,7 +1,7 @@
 const RouteNotFoundError = require('../errors/RouteNotFoundError');
 
-function notFoundHandler(_req, _res, next) {
-	return next(new RouteNotFoundError('Route not found'));
+function notFoundHandler(req, _res, next) {
+	return next(new RouteNotFoundError(req.originalUrl));
 }
 
 module.exports = notFoundHandler;
