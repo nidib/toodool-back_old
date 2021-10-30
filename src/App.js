@@ -1,7 +1,8 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
+const express = require('express');
+const helmet = require('helmet');
 const logger = require('./config/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
@@ -18,6 +19,7 @@ class App {
 		this.app.use(cors());
 		this.app.use(helmet());
 		this.app.use(compression());
+		this.app.use(cookieParser());
 		this.app.use(express.json());
 
 		logger.info('✅ Loaded early middlewares');

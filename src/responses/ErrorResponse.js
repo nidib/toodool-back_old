@@ -2,12 +2,9 @@ const ApiResponse = require('./ApiResponse');
 
 class ErrorResponse extends ApiResponse {
 	constructor(error) {
-		const data = {
-			message: error.message,
-			statusCode: error.statusCode
-		};
+		const data = { message: error.message };
 
-		super(data, false);
+		super(data, error.statusCode, false);
 	}
 }
 
