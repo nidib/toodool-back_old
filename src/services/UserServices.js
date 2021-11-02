@@ -1,4 +1,3 @@
-const camelize = require('camelize');
 const database = require('../config/database');
 const { userServicesQueryStrings: queryStrings } = require('../utils/constants/queryStringConstants');
 const UserInfoServices = require('./UserInfoServices');
@@ -11,7 +10,7 @@ class UserServices {
 			return undefined;
 		}
 
-		return camelize(result.rows[0]);
+		return result.rows[0];
 	}
 
 	static async createOne(username, password) {
@@ -28,7 +27,7 @@ class UserServices {
 			return null;
 		}
 
-		return camelize(result.rows[0]);
+		return result.rows[0];
 	}
 }
 

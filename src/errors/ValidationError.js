@@ -4,9 +4,7 @@ const ApiError = require('./ApiError');
 
 class ValidationError extends ApiError {
 	constructor() {
-		super(errorMessages.VALIDATION_ERROR);
-
-		this.statusCode = StatusCodes.FORBIDDEN;
+		super(errorMessages.VALIDATION_ERROR, StatusCodes.FORBIDDEN);
 	}
 }
 

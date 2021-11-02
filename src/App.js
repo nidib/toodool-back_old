@@ -7,6 +7,7 @@ const logger = require('./config/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
 const routes = require('./routes/routes');
+const { corsOptions } = require('./utils/constants/corsConstants');
 
 class App {
 	constructor() {
@@ -16,7 +17,7 @@ class App {
 	}
 
 	earlyMiddlewares() {
-		this.app.use(cors());
+		this.app.use(cors(corsOptions));
 		this.app.use(helmet());
 		this.app.use(compression());
 		this.app.use(cookieParser());
@@ -34,6 +35,8 @@ class App {
 
 	setRoutes() {
 		this.app.use(routes);
+
+		logger.info('✅ Loaded routes');
 	}
 
 	main() {

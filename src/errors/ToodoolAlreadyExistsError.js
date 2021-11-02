@@ -4,9 +4,7 @@ const ApiError = require('./ApiError');
 
 class ToodoolAlreadyExistsError extends ApiError {
 	constructor() {
-		super(errorMessages.TOODOOL_ALREADY_EXISTS);
-
-		this.statusCode = StatusCodes.CONFLICT;
+		super(errorMessages.TOODOOL_ALREADY_EXISTS, StatusCodes.CONFLICT);
 	}
 }
 

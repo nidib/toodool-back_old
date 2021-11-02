@@ -6,9 +6,7 @@ class RouteNotFoundError extends ApiError {
 	constructor(url, method) {
 		const finalMessage = `${errorMessages.ROUTE_NOT_FOUND}: [${method}] ${url}`;
 
-		super(finalMessage);
-
-		this.statusCode = StatusCodes.NOT_FOUND;
+		super(finalMessage, StatusCodes.NOT_FOUND);
 	}
 }
 

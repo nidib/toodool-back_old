@@ -1,4 +1,4 @@
-const { verifyToken } = require('../utils/hepers/tokenHelpers');
+const { verifyToken } = require('../utils/helpers/tokenHelpers');
 
 function authHandler(req, _res, next) {
 	let cookie, decodedToken;

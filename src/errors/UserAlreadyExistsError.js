@@ -4,9 +4,7 @@ const ApiError = require('./ApiError');
 
 class UserAlreadyExistsError extends ApiError {
 	constructor() {
-		super(errorMessages.USER_ALREADY_EXISTS);
-
-		this.statusCode = StatusCodes.CONFLICT;
+		super(errorMessages.USER_ALREADY_EXISTS, StatusCodes.CONFLICT);
 	}
 }
 

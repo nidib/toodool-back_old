@@ -4,9 +4,7 @@ const ApiError = require('./ApiError');
 
 class InvalidLoginInfoError extends ApiError {
 	constructor() {
-		super(errorMessages.INVALID_LOGIN_INFO);
-
-		this.statusCode = StatusCodes.FORBIDDEN;
+		super(errorMessages.INVALID_LOGIN_INFO, StatusCodes.FORBIDDEN);
 	}
 }
 

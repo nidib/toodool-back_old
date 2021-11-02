@@ -13,7 +13,7 @@ const UserServices = require('../services/UserServices');
 const UserInfoServices = require('../services/UserInfoServices');
 const { saltRounds } = require('../utils/constants/bcryptConstants');
 const { AUTH_KEY, AUTH_OPTIONS } = require('../utils/constants/cookieConstants');
-const { getToken } = require('../utils/hepers/tokenHelpers');
+const { getToken } = require('../utils/helpers/tokenHelpers');
 
 const ajv = new Ajv();
 
@@ -46,7 +46,7 @@ class UserController {
 
 			await UserServices.createOne(userCandidate.getUsername(), hashedPassword);
 
-			response = new SuccessResponse(null, StatusCodes.CREATED).response;
+			response = new SuccessResponse(null, StatusCodes.CREATED);
 		} catch (err) {
 			return next(err);
 		}
@@ -66,7 +66,7 @@ class UserController {
 			password: String(password)
 		};
 		const valid = ajv.compile(createUserSchema)(allowedRequestProperties);
-		let existingUser, response, correctPassword, validLogin, token, userCandidate;
+		let existingUser, response, correctPassword, token, userCandidate;
 
 		try {
 			if (!valid) {
@@ -81,14 +81,12 @@ class UserController {
 				correctPassword = await compare(userCandidate.getPassword(), existingUser.getPassword());
 			}
 
-			validLogin = existingUser && correctPassword;
-
-			if (!validLogin) {
+			if (!existingUser || !correctPassword) {
 				throw new InvalidLoginInfoError();
 			}
 
 			token = getToken({ key: existingUser.getId() });
-			response = new SuccessResponse(null).response;
+			response = new SuccessResponse();
 		} catch (err) {
 			return next(err);
 		}
@@ -122,7 +120,7 @@ class UserController {
 
 			await UserInfoServices.updateUserInfo(userInfoCandidate);
 
-			response = new SuccessResponse(null).response;
+			response = new SuccessResponse();
 		} catch (err) {
 			return next(err);
 		}
@@ -141,7 +139,7 @@ class UserController {
 
 		try {
 			userWithInfo = await UserServices.getInfo(userId);
-			response = new SuccessResponse(userWithInfo).response;
+			response = new SuccessResponse(userWithInfo);
 		} catch (err) {
 			return next(err);
 		}

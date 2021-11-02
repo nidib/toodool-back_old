@@ -19,7 +19,7 @@ class ToodoolController {
 
 		try {
 			toodools = await ToodoolServices.getToodoolsByUser(userId);
-			response = new SuccessResponse(toodools).response;
+			response = new SuccessResponse(toodools);
 		} catch (err) {
 			return next(err);
 		}
@@ -39,7 +39,7 @@ class ToodoolController {
 
 		try {
 			toodool = await ToodoolServices.getToodoolByUserAndId(userId, id);
-			response = new SuccessResponse(toodool).response;
+			response = new SuccessResponse(toodool);
 		} catch (err) {
 			return next(err);
 		}
@@ -75,7 +75,7 @@ class ToodoolController {
 
 			await ToodoolServices.createOne(newToodool);
 
-			response = new SuccessResponse(null, StatusCodes.CREATED).response;
+			response = new SuccessResponse(null, StatusCodes.CREATED);
 		} catch (err) {
 			return next(err);
 		}
@@ -109,7 +109,7 @@ class ToodoolController {
 
 			await ToodoolServices.updateToodol(updatedToodoolCandidate);
 
-			response = new SuccessResponse().response;
+			response = new SuccessResponse();
 		} catch (err) {
 			return next(err);
 		}
@@ -137,7 +137,30 @@ class ToodoolController {
 
 			await ToodoolServices.completeToodool(new ToodoolModel({ ...allowedRequestProperties, id, userId }));
 
-			response = new SuccessResponse().response;
+			response = new SuccessResponse();
+		} catch (err) {
+			return next(err);
+		}
+
+		return res
+			.status(response.statusCode)
+			.json(response);
+	}
+
+	// @desc   Delete a specific toodool
+	// @route  DELETE /api/v1/toodools/:id
+	// @access USER_SPECIFIC
+	static async deleteToodool(req, res, next) {
+		const { params, userId } = req;
+		const { id } = params;
+		let response, toodool;
+
+		try {
+			toodool = new ToodoolModel({ id, userId });
+
+			await ToodoolServices.deleteToodool(toodool);
+
+			response = new SuccessResponse();
 		} catch (err) {
 			return next(err);
 		}

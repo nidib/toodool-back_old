@@ -1,4 +1,3 @@
-const camelize = require('camelize');
 const database = require('../config/database');
 const { toodoolServicesQueryStrings: queryStrings } = require('../utils/constants/queryStringConstants');
 
@@ -14,7 +13,7 @@ class ToodoolServices {
 	static async getToodoolsByUser(userId) {
 		const result = await database.query(queryStrings.getToodolsByUserQueryString, [userId]);
 
-		return camelize(result.rows);
+		return result.rows;
 	}
 
 	static async getToodoolByUserAndId(userId, id) {
@@ -24,7 +23,7 @@ class ToodoolServices {
 			return null;
 		}
 
-		return camelize(result.rows[0]);
+		return result.rows[0];
 	}
 
 	static async getToodoolByUserAndTitle(userId, title) {
@@ -34,7 +33,7 @@ class ToodoolServices {
 			return undefined;
 		}
 
-		return camelize(result.rows[0]);
+		return result.rows[0];
 	}
 
 	static async updateToodol(toodoolDTO) {
@@ -53,6 +52,13 @@ class ToodoolServices {
 		const userId = toodoolDTO.getUserId();
 
 		database.query(queryStrings.completeToodoolQueryString, [completed, userId, id]);
+	}
+
+	static async deleteToodool(toodoolDTO) {
+		const id = toodoolDTO.getId();
+		const userId = toodoolDTO.getUserId();
+
+		database.query(queryStrings.deleteToodoolQueryString, [id, userId]);
 	}
 }
 

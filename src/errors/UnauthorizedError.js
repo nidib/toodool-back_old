@@ -4,9 +4,7 @@ const ApiError = require('./ApiError');
 
 class UnauthorizedError extends ApiError {
 	constructor() {
-		super(errorMessages.UNAUTHORIZED);
-
-		this.statusCode = StatusCodes.UNAUTHORIZED;
+		super(errorMessages.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 	}
 }
 
