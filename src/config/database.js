@@ -1,5 +1,5 @@
 const { Client, Pool } = require('pg');
-const { isTest } = require('../utils/hepers/environmentHelpers');
+const { isTest } = require('../utils/helpers/environmentHelpers');
 
 function getDatabase() {
 	if (isTest()) {

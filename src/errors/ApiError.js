@@ -1,9 +1,12 @@
+const { errorTypes } = require('../utils/constants/errorsConstants');
+
 class ApiError extends Error {
-	constructor(message) {
+	constructor(message, statusCode) {
 		super(message);
 
-		this.name = 'ApiError';
+		this.name = errorTypes.apiError;
 		this.caughtException = true;
+		this.statusCode = statusCode;
 	}
 }
 

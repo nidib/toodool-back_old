@@ -1,11 +1,13 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
+const express = require('express');
+const helmet = require('helmet');
 const logger = require('./config/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
 const routes = require('./routes/routes');
+const { corsOptions } = require('./utils/constants/corsConstants');
 
 class App {
 	constructor() {
@@ -15,9 +17,10 @@ class App {
 	}
 
 	earlyMiddlewares() {
-		this.app.use(cors());
+		this.app.use(cors(corsOptions));
 		this.app.use(helmet());
 		this.app.use(compression());
+		this.app.use(cookieParser());
 		this.app.use(express.json());
 
 		logger.info('✅ Loaded early middlewares');
@@ -32,6 +35,8 @@ class App {
 
 	setRoutes() {
 		this.app.use(routes);
+
+		logger.info('✅ Loaded routes');
 	}
 
 	main() {

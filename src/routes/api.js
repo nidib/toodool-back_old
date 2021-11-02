@@ -1,9 +1,10 @@
 const { Router } = require('express');
+const toodoolRoutes = require('./toodool/toodoolRoutes');
+const userRoutes = require('./user/userRoutes');
 
 const api = Router();
 
-api.get('/', (req, res) => {
-	return res.status(200).json({});
-});
+api.use('/users', userRoutes);
+api.use('/toodools', toodoolRoutes);
 
 module.exports = api;

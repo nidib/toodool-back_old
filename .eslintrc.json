@@ -21,7 +21,7 @@
 		"no-tabs": ["error", { "allowIndentationTabs": true }],
 		"one-var": "off",
 		"no-shadow": "off",
-		"no-unused-vars": "off",
+		"no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
 		"no-unused-expressions": ["error", { "allowShortCircuit": true }],
 		"one-var-declaration-per-line": "off",
 		"lines-between-class-members": "off",

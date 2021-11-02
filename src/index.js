@@ -9,6 +9,7 @@ const server = new Server(() => {
 			logger.info('✅ Connected to database');
 		})
 		.catch(err => {
+			logger.info('❌ Error connecting to database');
 			logger.error(err.message);
 		});
 });
