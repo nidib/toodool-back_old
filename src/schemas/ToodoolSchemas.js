@@ -1,33 +1,51 @@
+const {
+	boolean,
+	oneCharText,
+	oneCharTextOrNull,
+	uuid
+} = require('./_schemas');
+
+const ID = 'id';
+const USER_ID = 'userId';
+const TITLE = 'title';
+const DESCRIPTION = 'description';
+const COMPLETED = 'completed';
+
 const createToodoolSchema = {
 	type: 'object',
 	properties: {
-		title: { type: 'string', minLength: 1 },
-		description: { type: 'string', minLength: 1 }
+		[USER_ID]: uuid,
+		[TITLE]: oneCharText,
+		[DESCRIPTION]: oneCharTextOrNull
 	},
-	required: ['title']
+	required: [TITLE, USER_ID],
+	allowedProperties: [TITLE, DESCRIPTION]
 };
 
 const updateToodoolSchema = {
 	type: 'object',
 	properties: {
-		id: { type: 'string', format: 'uuid' },
-		completed: { type: 'boolean' },
-		title: { type: 'string', minLength: 1 },
-		description: { type: 'string', minLength: 1 }
+		[ID]: uuid,
+		[USER_ID]: uuid,
+		[COMPLETED]: boolean,
+		[TITLE]: oneCharText,
+		[DESCRIPTION]: oneCharTextOrNull
 	},
-	required: ['completed', 'title']
+	required: [ID, USER_ID, COMPLETED, TITLE],
+	allowedProperties: [TITLE, COMPLETED, DESCRIPTION]
 };
 
-const completeToodoolSchema = {
+const deleteToodoolSchema = {
 	type: 'object',
 	properties: {
-		completed: { type: 'boolean' }
+		[ID]: uuid,
+		[USER_ID]: uuid
 	},
-	required: ['completed']
+	required: [ID, USER_ID]
 };
 
 module.exports = {
-	completeToodoolSchema,
+	deleteToodoolSchema,
 	createToodoolSchema,
 	updateToodoolSchema
 };

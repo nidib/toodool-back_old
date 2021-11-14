@@ -14,4 +14,6 @@ function getDatabase() {
 	});
 }
 
-module.exports = getDatabase();
+module.exports = {
+	db: getDatabase()
+};

@@ -1,50 +1,39 @@
-const Ajv = require('ajv');
-const { hash, compare } = require('bcrypt');
+const { pick } = require('lodash');
 const { StatusCodes } = require('http-status-codes');
 const InvalidLoginInfoError = require('../errors/InvalidLoginInfoError');
 const UserAlreadyExistsError = require('../errors/UserAlreadyExistsError');
-const ValidationError = require('../errors/ValidationError');
-const UserModel = require('../models/UserModel');
-const UserInfoModel = require('../models/UserInfoModel');
+const UserModel = require('../models/User/_UserModel');
 const SuccessResponse = require('../responses/SuccessResponse');
-const { createUserSchema } = require('../schemas/UserSchemas');
+const { createUserSchema, loginUserSchema } = require('../schemas/UserSchemas');
 const { updateUserInfoSchema } = require('../schemas/UserInfoSchemas');
 const UserServices = require('../services/UserServices');
 const UserInfoServices = require('../services/UserInfoServices');
-const { saltRounds } = require('../utils/constants/bcryptConstants');
 const { AUTH_KEY, AUTH_OPTIONS } = require('../utils/constants/cookieConstants');
 const { getToken } = require('../utils/helpers/tokenHelpers');
-
-const ajv = new Ajv();
+const CreateUserModel = require('../models/User/CreateUserModel');
+const LoginUserSchema = require('../models/User/LoginUserModel');
+const UpdateUserInfoModel = require('../models/UserInfo/UpdateUserInfoModel');
+const { hashPassword, comparePassword } = require('../config/bcrypt');
 
 class UserController {
 	// @desc   Creates an user
 	// @route  POST /api/v1/users
 	// @access PUBLIC
 	static async createUser(req, res, next) {
-		const { username, password } = req.body;
-		const allowedRequestProperties = {
-			username: String(username),
-			password: String(password)
-		};
-		const valid = ajv.compile(createUserSchema)(allowedRequestProperties);
-		let existingUser, hashedPassword, response, userCandidate;
+		const allowedRequestProperties = pick(req.body, createUserSchema.allowedProperties);
+		let existingUser, hashedPassword, response, user;
 
 		try {
-			if (!valid) {
-				throw new ValidationError();
-			}
-
-			userCandidate = new UserModel(allowedRequestProperties);
-			existingUser = await UserServices.getUserByUsername(userCandidate.getUsername());
+			user = new CreateUserModel(allowedRequestProperties);
+			existingUser = await UserServices.getUserByUsername(user.getUsername());
 
 			if (existingUser) {
 				throw new UserAlreadyExistsError();
 			}
 
-			hashedPassword = await hash(userCandidate.getPassword(), saltRounds);
+			hashedPassword = await hashPassword(user.getPassword());
 
-			await UserServices.createOne(userCandidate.getUsername(), hashedPassword);
+			await UserServices.createOne(user.getUsername(), hashedPassword);
 
 			response = new SuccessResponse(null, StatusCodes.CREATED);
 		} catch (err) {
@@ -60,32 +49,23 @@ class UserController {
 	// @route  POST /api/v1/users/login
 	// @access PUBLIC
 	static async login(req, res, next) {
-		const { username, password } = req.body;
-		const allowedRequestProperties = {
-			username: String(username),
-			password: String(password)
-		};
-		const valid = ajv.compile(createUserSchema)(allowedRequestProperties);
-		let existingUser, response, correctPassword, token, userCandidate;
+		const allowedRequestProperties = pick(req.body, loginUserSchema.allowedProperties);
+		let existingUser, response, correctPassword, token, user;
 
 		try {
-			if (!valid) {
-				throw new ValidationError();
-			}
-
-			userCandidate = new UserModel(allowedRequestProperties);
-			existingUser = await UserServices.getUserByUsername(userCandidate.getUsername());
+			user = new LoginUserSchema(allowedRequestProperties);
+			existingUser = await UserServices.getUserByUsername(user.getUsername());
 
 			if (existingUser) {
 				existingUser = new UserModel(existingUser);
-				correctPassword = await compare(userCandidate.getPassword(), existingUser.getPassword());
+				correctPassword = await comparePassword(user.getPassword(), existingUser.getPassword());
 			}
 
 			if (!existingUser || !correctPassword) {
 				throw new InvalidLoginInfoError();
 			}
 
-			token = getToken({ key: existingUser.getId() });
+			token = getToken({ who: existingUser.getId() });
 			response = new SuccessResponse();
 		} catch (err) {
 			return next(err);
@@ -97,28 +77,30 @@ class UserController {
 			.json(response);
 	}
 
+	// @desc   Logs an user out
+	// @route  POST /api/v1/users/logout
+	// @access PUBLIC
+	static logout(_req, res, _next) {
+		const response = new SuccessResponse();
+
+		return res
+			.clearCookie(AUTH_KEY)
+			.status(response.statusCode)
+			.json(response);
+	}
+
 	// @desc   Update user info
 	// @route  PUT /api/v1/users
 	// @access USER_SPECIFIC
 	static async updateInfo(req, res, next) {
 		const { body, userId } = req;
-		const allowedRequestProperties = {
-			email: body.email,
-			firstName: body.firstName,
-			lastName: body.lastName,
-			nickname: body.nickname
-		};
-		const valid = ajv.compile(updateUserInfoSchema)(allowedRequestProperties);
-		let userInfoCandidate, response;
+		const allowedRequestProperties = pick(body, updateUserInfoSchema.allowedProperties);
+		let user, response;
 
 		try {
-			if (!valid) {
-				throw new ValidationError();
-			}
+			user = new UpdateUserInfoModel({ ...allowedRequestProperties, userId });
 
-			userInfoCandidate = new UserInfoModel({ ...allowedRequestProperties, userId });
-
-			await UserInfoServices.updateUserInfo(userInfoCandidate);
+			await UserInfoServices.updateUserInfo(user);
 
 			response = new SuccessResponse();
 		} catch (err) {
