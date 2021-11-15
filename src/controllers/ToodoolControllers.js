@@ -29,7 +29,7 @@ class ToodoolController {
 	}
 
 	// @desc   Get a toodool
-	// @route  GET /api/v1/toodools
+	// @route  GET /api/v1/toodools/:id
 	// @access USER_SPECIFIC
 	static async getToodool(req, res, next) {
 		const { params, userId } = req;
