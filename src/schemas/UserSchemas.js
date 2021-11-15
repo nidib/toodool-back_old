@@ -1,12 +1,27 @@
+const USERNAME = 'username';
+const PASSWORD = 'password';
+
 const createUserSchema = {
 	type: 'object',
 	properties: {
-		username: { type: 'string', minLength: 5 },
-		password: { type: 'string', minLength: 10 }
+		[USERNAME]: { type: 'string', minLength: 5 },
+		[PASSWORD]: { type: 'string', minLength: 10 }
 	},
-	required: ['username', 'password']
+	required: [USERNAME, PASSWORD],
+	allowedProperties: [USERNAME, PASSWORD]
+};
+
+const loginUserSchema = {
+	type: 'object',
+	properties: {
+		[USERNAME]: { type: 'string', minLength: 5 },
+		[PASSWORD]: { type: 'string', minLength: 10 }
+	},
+	required: [USERNAME, PASSWORD],
+	allowedProperties: [USERNAME, PASSWORD]
 };
 
 module.exports = {
-	createUserSchema
+	createUserSchema,
+	loginUserSchema
 };

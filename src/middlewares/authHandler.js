@@ -6,7 +6,7 @@ function authHandler(req, _res, next) {
 	try {
 		cookie = req.cookies['toodool-auth'];
 		decodedToken = verifyToken(cookie);
-		req.userId = decodedToken.key;
+		req.userId = decodedToken.who;
 	} catch (err) {
 		return next(err);
 	}

@@ -1,13 +1,12 @@
-const Ajv = require('ajv');
+const { pick } = require('lodash');
 const { StatusCodes } = require('http-status-codes');
 const ToodoolAlreadyExistsError = require('../errors/ToodoolAlreadyExistsError');
-const ValidationError = require('../errors/ValidationError');
-const ToodoolModel = require('../models/ToodoolModel');
+const CreateToodoolModel = require('../models/Toodool/CreateToodoolModel');
+const ToodoolModel = require('../models/Toodool/_ToodoolModel');
+const UpdateToodoolModel = require('../models/Toodool/UpdateToodoolModel');
 const SuccessResponse = require('../responses/SuccessResponse');
-const { createToodoolSchema, updateToodoolSchema, completeToodoolSchema } = require('../schemas/ToodoolSchemas');
 const ToodoolServices = require('../services/ToodoolServices');
-
-const ajv = new Ajv();
+const { createToodoolSchema, updateToodoolSchema } = require('../schemas/ToodoolSchemas');
 
 class ToodoolController {
 	// @desc   Get all toodools of the logged user
@@ -29,16 +28,18 @@ class ToodoolController {
 			.json(response);
 	}
 
-	// @desc   Get all toodools of the logged user
-	// @route  GET /api/v1/toodools
+	// @desc   Get a toodool
+	// @route  GET /api/v1/toodools/:id
 	// @access USER_SPECIFIC
 	static async getToodool(req, res, next) {
 		const { params, userId } = req;
 		const { id } = params;
+		const requestParameters = { id, userId };
 		let response, toodool;
 
 		try {
-			toodool = await ToodoolServices.getToodoolByUserAndId(userId, id);
+			toodool = new ToodoolModel({ ...requestParameters });
+			toodool = await ToodoolServices.getToodoolByUserAndId(toodool.getUserId(), toodool.getId());
 			response = new SuccessResponse(toodool);
 		} catch (err) {
 			return next(err);
@@ -54,26 +55,19 @@ class ToodoolController {
 	// @access USER_SPECIFIC
 	static async createToodol(req, res, next) {
 		const { body, userId } = req;
-		const allowedRequestProperties = {
-			title: String(body.title),
-			description: String(body.description)
-		};
-		const valid = ajv.compile(allowedRequestProperties)(createToodoolSchema);
-		let existingToodool, newToodool, response;
+		const requestParameters = { userId };
+		const allowedRequestProperties = pick(body, createToodoolSchema.allowedProperties);
+		let existingToodool, toodool, response;
 
 		try {
-			if (!valid) {
-				throw new ValidationError();
-			}
-
-			newToodool = new ToodoolModel({ ...allowedRequestProperties, userId });
-			existingToodool = await ToodoolServices.getToodoolByUserAndTitle(newToodool.getUserId(), newToodool.getTitle());
+			toodool = new CreateToodoolModel({ ...allowedRequestProperties, ...requestParameters });
+			existingToodool = await ToodoolServices.getToodoolByUserAndTitle(toodool.getUserId(), toodool.getTitle());
 
 			if (existingToodool) {
 				throw new ToodoolAlreadyExistsError();
 			}
 
-			await ToodoolServices.createOne(newToodool);
+			await ToodoolServices.createOne(toodool);
 
 			response = new SuccessResponse(null, StatusCodes.CREATED);
 		} catch (err) {
@@ -91,51 +85,14 @@ class ToodoolController {
 	static async updateToodool(req, res, next) {
 		const { body, params, userId } = req;
 		const { id } = params;
-		const allowedRequestProperties = {
-			id,
-			completed: body.completed,
-			title: String(body.title),
-			description: String(body.description)
-		};
-		const valid = ajv.compile(allowedRequestProperties)(updateToodoolSchema);
-		let updatedToodoolCandidate, response;
+		const requestParameters = { id, userId };
+		const allowedRequestProperties = pick(body, updateToodoolSchema.allowedProperties);
+		let toodool, response;
 
 		try {
-			if (!valid) {
-				throw new ValidationError();
-			}
+			toodool = new UpdateToodoolModel({ ...allowedRequestProperties, ...requestParameters });
 
-			updatedToodoolCandidate = new ToodoolModel({ ...allowedRequestProperties, userId });
-
-			await ToodoolServices.updateToodol(updatedToodoolCandidate);
-
-			response = new SuccessResponse();
-		} catch (err) {
-			return next(err);
-		}
-
-		return res
-			.status(response.statusCode)
-			.json(response);
-	}
-
-	// @desc   Complete a toodool
-	// @route  PUT /api/v1/toodools/:id/complete
-	// @access USER_SPECIFIC
-	static async completeToodool(req, res, next) {
-		const { body, params, userId } = req;
-		const { completed } = body;
-		const { id } = params;
-		const allowedRequestProperties = { completed };
-		const valid = ajv.compile(allowedRequestProperties)(completeToodoolSchema);
-		let response;
-
-		try {
-			if (!valid) {
-				throw new ValidationError();
-			}
-
-			await ToodoolServices.completeToodool(new ToodoolModel({ ...allowedRequestProperties, id, userId }));
+			await ToodoolServices.updateToodol(toodool);
 
 			response = new SuccessResponse();
 		} catch (err) {
@@ -153,10 +110,11 @@ class ToodoolController {
 	static async deleteToodool(req, res, next) {
 		const { params, userId } = req;
 		const { id } = params;
+		const allowedRequestProperties = { id, userId };
 		let response, toodool;
 
 		try {
-			toodool = new ToodoolModel({ id, userId });
+			toodool = new ToodoolModel(allowedRequestProperties);
 
 			await ToodoolServices.deleteToodool(toodool);
 

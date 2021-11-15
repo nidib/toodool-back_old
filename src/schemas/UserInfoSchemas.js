@@ -1,11 +1,19 @@
+const { email } = require('./_schemas');
+
+const EMAIL = 'email';
+const FIRST_NAME = 'firstName';
+const LAST_NAME = 'lastName';
+const NICKNAME = 'nickname';
+
 const updateUserInfoSchema = {
 	type: 'object',
 	properties: {
-		email: { type: 'string', format: 'email' },
-		firstName: { type: 'string', minLength: 3 },
-		lastName: { type: 'string', minLength: 1 },
-		nickname: { type: 'string', minLength: 3 }
-	}
+		[EMAIL]: email,
+		[FIRST_NAME]: { type: ['string', 'null'], minLength: 3 },
+		[LAST_NAME]: { type: ['string', 'null'], minLength: 1 },
+		[NICKNAME]: { type: ['string', 'null'], minLength: 3 }
+	},
+	allowedProperties: [EMAIL, FIRST_NAME, LAST_NAME, NICKNAME]
 };
 
 module.exports = {
